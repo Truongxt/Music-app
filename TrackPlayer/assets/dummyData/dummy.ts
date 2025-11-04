@@ -1,0 +1,43 @@
+export const suggestion = [
+  {
+    _id: "6909a365c2a85f57f55aff8d",
+    title: "I Don't Think I Like Her",
+    artist: [{ id: "69046a7ceba8d734b7b59377", name: "Charlie Puth" }],
+    album: null,
+    file: "https://res.cloudinary.com/dzcwbvlk4/video/upload/v1761896208/I_Don_t_Think_That_I_Like_Her_e0oeyx.mp3",
+    img: "https://res.cloudinary.com/dzcwbvlk4/image/upload/v1762001135/1663246672683_300_xdznkj.jpg",
+    duration: 308,
+    likes: 1230,
+    views: 1123,
+    comments: 0,
+  },
+  {
+    _id: "6909a3a8c2a85f57f55aff8f",
+    title: "Light Switch",
+    artist: [{ id: "69046a7ceba8d734b7b59377", name: "Charlie Puth" }],
+    album: null,
+    file: "https://res.cloudinary.com/dzcwbvlk4/video/upload/v1761896196/Light_Switch_dxt5i5.mp3",
+    img: "https://res.cloudinary.com/dzcwbvlk4/image/upload/v1762001139/1642736049551_300_pye9pk.jpg",
+    duration: 308,
+    likes: 1230,
+    views: 1123,
+    comments: 0,
+  },
+  {
+    _id: "69061266af6d7836889b5fe3",
+    title: "Dancing In The Dark",
+    artist: [
+      {
+        id: "69046b29eba8d734b7b5937e",
+        name: "Soobin Hoàng Sơn",
+      },
+    ],
+    album: null,
+    file: "https://res.cloudinary.com/dzcwbvlk4/video/upload/v1761896208/Dancing_In_The_Dark_indd5z.mp3",
+    img: "https://res.cloudinary.com/dzcwbvlk4/image/upload/v1762001137/1719064624372_300_vfbaez.jpg",
+    duration: 240,
+    likes: 430000,
+    views: 95000000,
+    comments: 83000,
+  },
+];

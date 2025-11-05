@@ -3,19 +3,41 @@ import { Artist } from "@/src/constants/types";
 import { formatThousandsToK } from "@/src/helpers/formatters";
 import { moderateScale, verticalScale } from "@/src/helpers/scales";
 import { FontAwesome } from "@expo/vector-icons";
-import React from "react";
+import React, { useState } from "react";
 import { Image, Pressable, Text, View } from "react-native";
 import FollowButton from "../button/FollowButton";
+import { useArtist } from "@/src/providers/ArtistContext";
+import { userService } from "@/src/services/userService";
 
 type AritstItemProps = {
   artist: Artist;
   handleOnSelect: (id: string) => void;
 };
 
-export default function ArtistItem({ artist, handleOnSelect }: AritstItemProps) {
+export default function ArtistItem({
+  artist,
+  handleOnSelect,
+}: AritstItemProps) {
+  const { state, dispatch } = useArtist();
+  const followed = state.artists.some((a) => a._id === artist._id);
+
+  const onFollow = async () => {
+    try {
+      const res = await userService.toggleFollowAritst(artist._id);
+
+      if (followed) {
+        dispatch({ type: "DELETE_ARTIST", payload: artist._id });
+      } else {
+        dispatch({ type: "ADD_ARTIST", payload: artist });
+      }
+    } catch (err) {
+      console.log("Lỗi khi follow artist", err);
+    }
+  };
+
   return (
     <Pressable
-    onPress={()=>handleOnSelect(artist._id)}
+      onPress={() => handleOnSelect(artist._id)}
       style={{
         flexDirection: "row",
         alignItems: "center",
@@ -42,7 +64,11 @@ export default function ArtistItem({ artist, handleOnSelect }: AritstItemProps) 
           </Text>
         </View>
       </View>
-      <FollowButton style={{ position: "absolute", right: 0 }} />
+      <FollowButton
+        followed={followed}
+        onPress={onFollow}
+        style={{ position: "absolute", right: 0 }}
+      />
     </Pressable>
   );
 }

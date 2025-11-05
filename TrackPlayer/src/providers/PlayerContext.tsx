@@ -9,7 +9,7 @@ import React, {
   useState,
 } from "react";
 
-interface AudioPlayerContextType {
+type AudioPlayerContextType = {
   currentTrack: Track | null;
   queue: Track[];
   currentIndex: number;

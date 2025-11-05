@@ -1,14 +1,17 @@
 import AlbumList from "@/src/components/albums/AlbumList";
+import FollowButton from "@/src/components/button/FollowButton";
 import Header from "@/src/components/common/Header";
 import TrackItem from "@/src/components/tracks/TrackItem";
 import { colors, fontSize, radius } from "@/src/constants/tokens";
 import { Album, Track } from "@/src/constants/types";
 import { formatThousandsToK } from "@/src/helpers/formatters";
 import { moderateScale, scale, verticalScale } from "@/src/helpers/scales";
+import { useArtist } from "@/src/providers/ArtistContext";
 import { useAudioPlayerGlobal } from "@/src/providers/PlayerContext";
 import { albumService } from "@/src/services/albumService";
 import { artistService } from "@/src/services/artistService";
 import { trackService } from "@/src/services/trackService";
+import { userService } from "@/src/services/userService";
 import { defaultStyles } from "@/src/styles";
 import { Entypo, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -28,10 +31,13 @@ export default function ArtistProfileScreen() {
   const router = useRouter();
   const { playTrack } = useAudioPlayerGlobal();
   const [artist, setArtist] = useState<any>();
-  const [tracks, setTracks] = useState<[Track]>();
-  const [albums, setAlbums] = useState<[Album]>(); 
+  const [tracks, setTracks] = useState<Track[]>();
+  const [albums, setAlbums] = useState<Album[]>();
   const [expanded, setExpanded] = useState<boolean>(false);
-
+  const { state, dispatch } = useArtist();
+  const followed = artist
+    ? state.artists.some((a) => a._id === artist._id)
+    : false;
   useEffect(() => {
     const fetchAritst = async () => {
       try {
@@ -41,6 +47,7 @@ export default function ArtistProfileScreen() {
         console.log("Lỗi get artist by id: " + err);
       }
     };
+
     const fetchTrack = async () => {
       try {
         const tracks = await trackService.getByArtist(String(id));
@@ -49,7 +56,7 @@ export default function ArtistProfileScreen() {
         console.log("Lỗi get tracks by artist: " + err);
       }
     };
-    const fetchAlbum = async () =>{
+    const fetchAlbum = async () => {
       try {
         const albums = await albumService.findByAritst(String(id));
         console.log(albums);
@@ -57,11 +64,25 @@ export default function ArtistProfileScreen() {
       } catch (err) {
         console.log("Lỗi get albums by artist: " + err);
       }
-    }
+    };
     fetchAritst();
     fetchTrack();
     fetchAlbum();
   }, [id]);
+
+  const onFollow = async () => {
+    try {
+      const res = await userService.toggleFollowAritst(artist._id);
+
+      if (followed) {
+        dispatch({ type: "DELETE_ARTIST", payload: artist._id });
+      } else {
+        dispatch({ type: "ADD_ARTIST", payload: artist });
+      }
+    } catch (err) {
+      console.log("Lỗi khi follow artist", err);
+    }
+  };
 
   const handleClickOnTrack = (track: Track) => {
     playTrack(track);
@@ -101,24 +122,7 @@ export default function ArtistProfileScreen() {
           ]}
         >
           <View style={styles.rows}>
-            <Pressable
-              style={{
-                backgroundColor: "black",
-                paddingHorizontal: scale(20),
-                paddingVertical: 8,
-                borderRadius: 30,
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: moderateScale(fontSize.xs + 2),
-                  fontWeight: "600",
-                  color: "white",
-                }}
-              >
-                Follow
-              </Text>
-            </Pressable>
+            <FollowButton onPress={onFollow} followed={followed} />
             <Pressable>
               <Entypo
                 name="dots-three-horizontal"
@@ -155,20 +159,34 @@ export default function ArtistProfileScreen() {
         </View>
 
         {/* Albums */}
-        
-        {albums && <View>
-          <Text style={styles.groupText}>Album</Text>
-          <AlbumList horizontal albums={albums}/>
-        </View>}
+
+        {albums && (
+          <View>
+            <Text style={styles.groupText}>Album</Text>
+            <AlbumList horizontal albums={albums} />
+          </View>
+        )}
 
         {/* Mô tả */}
         <View>
           <Text style={styles.groupText}>About</Text>
           {artist?.descriptionImg && (
-            <Image source={{ uri: artist.descriptionImg }} style={{height: verticalScale(200), borderRadius: radius.cardRadius, marginBottom: verticalScale(10)}}/>
+            <Image
+              source={{ uri: artist.descriptionImg }}
+              style={{
+                height: verticalScale(200),
+                borderRadius: radius.cardRadius,
+                marginBottom: verticalScale(10),
+              }}
+            />
           )}
           <Text
-            style={{ fontSize: moderateScale(fontSize.sm - 1), lineHeight: moderateScale(25), color: colors.smallText, fontWeight: "500" }}
+            style={{
+              fontSize: moderateScale(fontSize.sm - 1),
+              lineHeight: moderateScale(25),
+              color: colors.smallText,
+              fontWeight: "500",
+            }}
             numberOfLines={expanded ? undefined : 5}
           >
             {artist?.description}
@@ -210,6 +228,6 @@ const styles = StyleSheet.create({
   groupText: {
     fontWeight: "600",
     fontSize: fontSize.base,
-    marginVertical: verticalScale(12)
+    marginVertical: verticalScale(12),
   },
 });

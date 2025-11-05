@@ -4,7 +4,6 @@ import { colors, fontSize } from "@/src/constants/tokens";
 import { verticalScale } from "@/src/helpers/scales";
 import { searchService } from "@/src/services/searchService";
 import { defaultStyles } from "@/src/styles";
-import { useRouter } from "expo-router";
 import React, { useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -20,7 +19,6 @@ export default function Search() {
   const [searchValue, setSearchValue] = useState("");
   const [results, setResults] = useState<any[]>([]);
   const [isActiveTab, setIsActiveTab] = useState<number>(1);
-  const router = useRouter();
   const handleOnClear = () => setSearchValue("");
 
   const handleOnClickTab = (idTab: number) => setIsActiveTab(idTab);

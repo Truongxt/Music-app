@@ -65,7 +65,6 @@ export default function Home() {
   };
 
   const handleClickOnAritst = (id: string) => {
-    console.log(id);
     router.push(`/home/artist/${id}`);
   };
 

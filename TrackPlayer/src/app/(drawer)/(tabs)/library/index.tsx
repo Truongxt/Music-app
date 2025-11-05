@@ -1,27 +1,53 @@
 import Header from "@/src/components/common/Header";
-import { TrackList } from "@/src/components/tracks/TrackList";
+import LibraryList from "@/src/components/LibraryList";
 import { colors } from "@/src/constants/tokens";
-import { Track } from "@/src/constants/types";
-import { moderateScale } from "@/src/helpers/scales";
-import { useAuth } from "@/src/providers/AuthContext";
-import { userService } from "@/src/services/userService";
+import { moderateScale, verticalScale } from "@/src/helpers/scales";
+import { useArtist } from "@/src/providers/ArtistContext";
+import { usePlaylist } from "@/src/providers/PlayListContext";
+import { useTrack } from "@/src/providers/TrackContext";
 import { defaultStyles } from "@/src/styles";
 import { Fontisto } from "@expo/vector-icons";
-import React, { useEffect, useState } from "react";
-import { StyleSheet } from "react-native";
+import { useRouter } from "expo-router";
+import React, { useMemo, useState } from "react";
+import { Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function Library() {
-  const { likedTrackIds } = useAuth();
-  const [likedTracks, setLikedTracks] = useState<Track[]>([]);
-  useEffect(() => {
-    const fetchLikedTracks = async () => {
-      const data = await userService.getLikedTracks();
-      setLikedTracks(data);
-    };
+const tabs = [
+  { id: 1, title: "All" },
+  { id: 2, title: "Playlists" },
+  { id: 3, title: "Songs" },
+  { id: 4, title: "Artists" },
+];
 
-    fetchLikedTracks();
-  }, [likedTrackIds]);
+export default function Library() {
+  const [activeTab, setIsActiveTab] = useState<number>(1);
+  const router = useRouter();
+  const { state: artists } = useArtist();
+  const { tracks } = useTrack();
+  const {state: playlists} = usePlaylist();
+
+  const combinedList = useMemo(() => {
+    return [
+      ...artists.artists.map((a) => ({ ...a, type: "artist" })),
+      ...tracks.map((t) => ({ ...t, type: "track" })),
+      ...playlists.playlists.map((p) => ({ ...p, type: "playlist" }))
+    ];
+  }, [artists, tracks, playlists]);
+
+  const filteredList = useMemo(() => {
+    switch (activeTab) {
+      case 1:
+        return combinedList;
+      case 2:
+        return combinedList.filter((i) => i.type === "playlist");
+      case 3:
+        return combinedList.filter((i) => i.type === "track");
+      case 4:
+        return combinedList.filter((i) => i.type === "artist");
+      default:
+        return [];
+    }
+  }, [activeTab, combinedList]);
 
   return (
     <SafeAreaView style={defaultStyles.container}>
@@ -35,11 +61,47 @@ export default function Library() {
           />
         }
       />
-      <TrackList tracks={likedTracks} />
+
+      <View
+        style={{
+          gap: 5,
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginVertical: verticalScale(10),
+        }}
+      >
+        {tabs.map((item) => (
+          <Pressable
+            key={item.id}
+            onPress={() => {
+              setIsActiveTab(item.id !== 2 ? item.id : 1);
+              if (item.title === "Playlists") {
+                router.push("/(drawer)/(tabs)/library/playlists");
+              }
+            }}
+            style={{
+              paddingVertical: verticalScale(8),
+              borderRadius: moderateScale(20),
+              backgroundColor:
+                item.id === activeTab ? colors.primary : "#F2F4F3",
+              flex: 1,
+            }}
+          >
+            <Text
+              style={{
+                textAlign: "center",
+                fontWeight: "500",
+                color: item.id === activeTab ? "white" : colors.smallText,
+              }}
+            >
+              {item.title}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+
+      <LibraryList library={filteredList} />
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
-});

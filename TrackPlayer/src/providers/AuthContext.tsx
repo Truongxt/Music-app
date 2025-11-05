@@ -2,16 +2,21 @@ import api from "@/src/services/api";
 import * as SecureStore from "expo-secure-store";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { User } from "../constants/types";
+import { userService } from "../services/userService";
+import { useArtist } from "./ArtistContext";
+import { usePlaylist } from "./PlayListContext";
+import { useTrack } from "./TrackContext";
 
 type AuthContextType = {
   user: User | null;
   loading: boolean;
   login: (username: string, password: string) => Promise<void>;
-  register: (username: string, password: string, displayName?: string) => Promise<void>;
+  register: (
+    username: string,
+    password: string,
+    displayName?: string
+  ) => Promise<void>;
   logout: () => Promise<void>;
-
-  likedTrackIds: string[];
-  toggleLikeTrack: (trackId: string) => void;
 };
 
 const AuthContext = createContext<AuthContextType>({
@@ -20,24 +25,26 @@ const AuthContext = createContext<AuthContextType>({
   login: async () => {},
   register: async () => {},
   logout: async () => {},
-  likedTrackIds: [],
-  toggleLikeTrack: () => {},
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [likedTrackIds, setLikedTrackIds] = useState<string[]>([]);
+
+  const { state, dispatch: dispatchArtist } = useArtist();
+  const { dispatch: dispatchPlaylist } = usePlaylist();
+  const { dispatch: dispatchTrack } = useTrack();
 
   useEffect(() => {
     const loadSession = async () => {
       const token = await SecureStore.getItemAsync("token");
       const userData = await SecureStore.getItemAsync("user");
+
       if (token && userData) {
         api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
         const u = JSON.parse(userData);
         setUser(u);
-        setLikedTrackIds(u.likedTracks || []); // chỉ init 1 lần từ user DB
+
       }
       setLoading(false);
     };
@@ -53,10 +60,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     setUser(user);
-    setLikedTrackIds(user.likedTracks || []);
+
   };
 
-  const register = async (username: string, password: string, displayName?: string) => {
+  const register = async (
+    username: string,
+    password: string,
+    displayName?: string
+  ) => {
     await api.post("/auth/register", { username, password, displayName });
   };
 
@@ -64,15 +75,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     await SecureStore.deleteItemAsync("token");
     await SecureStore.deleteItemAsync("user");
     setUser(null);
-    setLikedTrackIds([]);
-  };
 
-  const toggleLikeTrack = (trackId: string) => {
-    setLikedTrackIds(prev =>
-      prev.includes(trackId)
-        ? prev.filter(x => x !== trackId)
-        : [...prev, trackId]
-    );
+    dispatchArtist({ type: "SET_ARTISTS", payload: [] });
+    dispatchPlaylist({ type: "SET_PLAYLISTS", payload: [] });
+    dispatchTrack({ type: "SET_TRACKS", payload: [] });
   };
 
   return (
@@ -83,8 +89,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         login,
         register,
         logout,
-        likedTrackIds,
-        toggleLikeTrack
       }}
     >
       {children}

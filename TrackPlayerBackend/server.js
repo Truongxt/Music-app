@@ -10,6 +10,7 @@ import authRoute from "./routes/authRoute.js";
 import userRoute from "./routes/userRoute.js";
 import commentRouter from "./routes/commentRoute.js";
 import searchRoute from "./routes/searchRoute.js";
+import playlistRoute from "./routes/playlistRoute.js";
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -31,6 +32,7 @@ app.use("/albums", albumRoute);
 app.use("/user", userRoute);
 app.use("/comments", commentRouter);
 app.use("/search", searchRoute);
+app.use("/playlist", playlistRoute);
 
 app.get("/", (req, res) => {
   res.json({ message: "Server is running successfully!" });

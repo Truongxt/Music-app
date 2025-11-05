@@ -6,4 +6,4 @@ const playlistSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User"},
 }, { timestamps: true });
 
-export default mongoose.model("Playlist", albumSchema);
+export default mongoose.model("Playlist", playlistSchema);

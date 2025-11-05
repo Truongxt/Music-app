@@ -57,3 +57,10 @@ export type Album = {
   cover: string;
   track?: [string];
 };
+
+export type Playlist = {
+  _id?: string;
+  name: string;
+  tracks: Track[];
+  user: string;
+}

@@ -5,15 +5,14 @@ import { useRouter } from "expo-router";
 import React from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 
-interface HeaderProps {
+type HeaderProps = {
   centerTitle?: string;
   leftTitle?: string;
   backIcon?: boolean;
   appLogo?: Image;
   rightSection?: React.ReactNode;
   leftIcon?: React.ReactNode;
-
-}
+};
 
 export default function Header({
   centerTitle,
@@ -65,7 +64,7 @@ export default function Header({
       {centerTitle ? (
         <Text
           style={{
-            fontSize: moderateScale(fontSize.lg),
+            fontSize: moderateScale(fontSize.base),
             fontWeight: "500",
             color: "#000",
           }}

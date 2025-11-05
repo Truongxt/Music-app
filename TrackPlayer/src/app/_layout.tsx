@@ -6,27 +6,36 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AuthProvider, useAuth } from "../providers/AuthContext";
 import { CommentSheetProvider } from "../providers/CommentBottomSheetContext";
 import { AudioPlayerProvider } from "../providers/PlayerContext";
+import { PlaylistProvider } from "../providers/PlayListContext";
+import { ArtistProvider } from "../providers/ArtistContext";
+import { TrackProvider } from "../providers/TrackContext";
 
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
   return (
     <SafeAreaProvider>
-      <AuthProvider>
-        <AudioPlayerProvider>
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <CommentSheetProvider>
-              <RootNaviagtion />
-              <StatusBar style="auto" />
-            </CommentSheetProvider>
-          </GestureHandlerRootView>
-        </AudioPlayerProvider>
-      </AuthProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <AuthProvider>
+          <ArtistProvider>
+            <PlaylistProvider>
+              <TrackProvider>
+                <CommentSheetProvider>
+                  <AudioPlayerProvider>
+                    <RootNavigation />
+                    <StatusBar style="auto"/>
+                  </AudioPlayerProvider>
+                </CommentSheetProvider>
+              </TrackProvider>
+            </PlaylistProvider>
+          </ArtistProvider>
+        </AuthProvider>
+      </GestureHandlerRootView>
     </SafeAreaProvider>
   );
 }
 
-const RootNaviagtion = () => {
+const RootNavigation = () => {
   const { user, loading } = useAuth();
 
   useEffect(() => {

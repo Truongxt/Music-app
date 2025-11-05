@@ -2,6 +2,8 @@ import { colors, fontSize } from "@/src/constants/tokens";
 import { moderateScale, scale, verticalScale } from "@/src/helpers/scales";
 import { useAuth } from "@/src/providers/AuthContext";
 import { useAudioPlayerGlobal } from "@/src/providers/PlayerContext";
+import { useTrack } from "@/src/providers/TrackContext";
+import { trackService } from "@/src/services/trackService";
 import { userService } from "@/src/services/userService";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -18,30 +20,33 @@ import {
 
 export const FloatingPlayer = ({ style }: ViewProps) => {
   const { currentTrack, status, pause, resume } = useAudioPlayerGlobal();
-  const { user, toggleLikeTrack } = useAuth();
+  const { dispatch, tracks } = useTrack();
   const [likedTrack, setLikedTrack] = useState<boolean>(false);
 
   const router = useRouter();
   useEffect(() => {
-    if (currentTrack?._id && user?.likedTracks.includes(currentTrack._id)) {
-      setLikedTrack(true);
-    }
-  }, [currentTrack, user?.likedTracks]);
-  if (!currentTrack) return null;
+    const isLiked = tracks.some((item) => item._id === currentTrack?._id);
+    setLikedTrack(isLiked);
+  }, [tracks, currentTrack]);
 
-    const handleOnLike = async () => {
+  const handleOnLike = async () => {
     if (!currentTrack) return;
 
     try {
       const res = await userService.toggleLikeTrack(currentTrack._id);
-      
-      const updatedLikes = res?.likedTracks || [];
+      const liked = res?.likedTracks.includes(currentTrack._id);
 
-      setLikedTrack(updatedLikes.includes(currentTrack._id));
+      setLikedTrack(liked);
 
-      toggleLikeTrack(updatedLikes); 
+      const trackDetails = await trackService.getById(currentTrack._id);
+
+      if (liked) {
+        dispatch({ type: "ADD_TRACK", payload: trackDetails });
+      } else {
+        dispatch({ type: "REMOVE_TRACK", payload: currentTrack._id });
+      }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -49,6 +54,10 @@ export const FloatingPlayer = ({ style }: ViewProps) => {
     if (status?.playing) await pause();
     else await resume();
   };
+
+  if(!currentTrack){
+    return <></>;
+  }
 
   return (
     <Pressable

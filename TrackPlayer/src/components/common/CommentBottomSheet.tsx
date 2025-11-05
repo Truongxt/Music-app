@@ -40,7 +40,7 @@ export default function CommentBottomSheet({
   }, [onMount]);
 
   const handleOnPostCmt = async () => {
-    if (!target) return;
+    if (!target || !inputComment) return;
 
     try {
       const newComment = await commentService.postComment({

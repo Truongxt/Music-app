@@ -1,16 +1,22 @@
 import Track from "../models/Track.js";
-import Tracks from "../models/Track.js";
 
 export const add = async (req, res) => {};
 
 export const update = async (req, res) => {};
 
-export const findById = async (req, res) => {};
+export const findById = async (req, res) => {
+  const { id } = req.params;
+  const data = await Track.findById(id).populate("artist", "name");
+  return res.json(data);
+};
 
 export const findByArtist = async (req, res) => {
   const { id } = req.params;
   try {
-    const tracks = await Track.find({ artist: id }).populate("artist", "name img");
+    const tracks = await Track.find({ artist: id }).populate(
+      "artist",
+      "name img"
+    );
 
     return res.status(200).json(tracks);
   } catch (err) {

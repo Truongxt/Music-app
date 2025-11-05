@@ -25,50 +25,57 @@ import {
   formatSecondsToMinutes,
   formatThousandsToK,
 } from "../helpers/formatters";
-import { useAuth } from "../providers/AuthContext";
 import { useCommentSheet } from "../providers/CommentBottomSheetContext";
 import { useAudioPlayerGlobal } from "../providers/PlayerContext";
 import { commentService } from "../services/commentService";
 import { userService } from "../services/userService";
+import { useTrack } from "../providers/TrackContext";
+import { trackService } from "../services/trackService";
 
 export default function Player() {
   const [likedTrack, setLikedTrack] = useState<boolean>(false);
   const router = useRouter();
   const { openCommentSheet } = useCommentSheet();
-  const { user, toggleLikeTrack } = useAuth();
+  const { tracks, dispatch } = useTrack();
   const { currentTrack, status, pause, resume, seek } = useAudioPlayerGlobal();
   const [isSliding, setIsSliding] = useState(false);
   const [sliderValue, setSliderValue] = useState(0);
 
   useEffect(() => {
-    if (currentTrack?._id && user?.likedTracks.includes(currentTrack._id)) {
-      setLikedTrack(true);
-    }
-  }, [currentTrack, user?.likedTracks]);
+    const isLiked = tracks.some((item) => item._id === currentTrack?._id);
+    setLikedTrack(isLiked);
+  }, [tracks, currentTrack]);
 
   const handleOnOpenCommentSheet = async () => {
     if (!currentTrack?._id) return;
     try {
-      const comments = await commentService.findByTrack(String(currentTrack._id));
+      const comments = await commentService.findByTrack(
+        String(currentTrack._id)
+      );
       openCommentSheet({ type: "track", id: currentTrack._id }, comments);
     } catch (err) {
       console.log(err);
     }
-  }
+  };
 
   const handleOnLike = async () => {
-    if (!currentTrack || !user) return;
+    if (!currentTrack) return;
+
     try {
       const res = await userService.toggleLikeTrack(currentTrack._id);
+      const liked = res?.likedTracks.includes(currentTrack._id);
 
-      const updatedLikes = res?.likedTracks || [];
+      setLikedTrack(liked);
 
-      setLikedTrack(updatedLikes.includes(currentTrack._id));
-      toggleLikeTrack(updatedLikes);
-      console.log(updatedLikes);
-      user.likedTracks = updatedLikes;
+      const trackDetails = await trackService.getById(currentTrack._id);
+
+      if (liked) {
+        dispatch({ type: "ADD_TRACK", payload: trackDetails });
+      } else {
+        dispatch({ type: "REMOVE_TRACK", payload: currentTrack._id });
+      }
     } catch (error) {
-      console.error("Lỗi khi like bài hát:", error);
+      console.error(error);
     }
   };
 

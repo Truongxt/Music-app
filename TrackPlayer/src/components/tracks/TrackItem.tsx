@@ -6,24 +6,62 @@ import {
   formatThousandsToK,
 } from "@/src/helpers/formatters";
 import { moderateScale, scale, verticalScale } from "@/src/helpers/scales";
-import { Entypo, Ionicons } from "@expo/vector-icons";
-import React from "react";
+import { useTrackActionSheet } from "@/src/providers/TrackActionBottomSheetContext";
+import { useTrack } from "@/src/providers/TrackContext";
+import { trackService } from "@/src/services/trackService";
+import { userService } from "@/src/services/userService";
+import { Entypo, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import React, { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type TrackItemType = {
   track: Track;
   onTrackSelect?: (track: Track) => void;
+  library?: boolean;
 };
 
 export default function TrackItem({
   track,
   onTrackSelect: onTrackSelected,
+  library = false,
 }: TrackItemType) {
+  const { tracks, dispatch } = useTrack();
+  const [likedTrack, setLikedTrack] = useState<boolean>();
+  const { openActionSheet } = useTrackActionSheet();
+  useEffect(() => {
+    if (library) {
+      setLikedTrack(tracks.some((t) => t._id === track._id));
+    }
+  }, [tracks, track._id, library]);
+
+  const handleOnLike = async () => {
+    try {
+      const res = await userService.toggleLikeTrack(track._id);
+      const liked = res?.likedTracks.includes(track._id);
+
+      setLikedTrack(liked);
+
+      const trackDetails = await trackService.getById(track._id);
+
+      if (liked) {
+        dispatch({ type: "ADD_TRACK", payload: trackDetails });
+      } else {
+        dispatch({ type: "REMOVE_TRACK", payload: track._id });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleOnThreeDotsClick = () => {
+    openActionSheet(track);
+  } 
+
   return (
     <View style={styles.container}>
       <TouchableOpacity
         style={{ flexDirection: "row", alignItems: "center" }}
-        onPress={() => onTrackSelected &&  onTrackSelected(track)}
+        onPress={() => onTrackSelected && onTrackSelected(track)}
         activeOpacity={0.8}
       >
         <Image
@@ -57,13 +95,41 @@ export default function TrackItem({
         </View>
       </TouchableOpacity>
 
-      <TouchableOpacity style={{ position: "absolute", right: 0 }}>
-        <Entypo
-          name="dots-three-horizontal"
-          size={moderateScale(18)}
-          color="#555"
-        />
-      </TouchableOpacity>
+      {library ? (
+        <TouchableOpacity
+          style={{ position: "absolute", right: 0 }}
+          onPress={handleOnLike}
+          hitSlop={{
+            top: scale(10),
+            bottom: scale(10),
+            left: scale(10),
+            right: scale(10),
+          }}
+        >
+          <MaterialCommunityIcons
+            name={likedTrack ? "heart" : "heart-outline"}
+            size={scale(20)}
+            color={likedTrack ? "red" : "white"}
+          />
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity
+        onPress={handleOnThreeDotsClick}
+          style={{ position: "absolute", right: 0 }}
+          hitSlop={{
+            top: scale(10),
+            bottom: scale(10),
+            left: scale(10),
+            right: scale(10),
+          }}
+        >
+          <Entypo
+            name="dots-three-horizontal"
+            size={moderateScale(18)}
+            color="#555"
+          />
+        </TouchableOpacity>
+      )}
     </View>
   );
 }

@@ -2,12 +2,12 @@ import { colors, fontSize } from "@/src/constants/tokens";
 import { Artist } from "@/src/constants/types";
 import { formatThousandsToK } from "@/src/helpers/formatters";
 import { moderateScale, verticalScale } from "@/src/helpers/scales";
-import { FontAwesome } from "@expo/vector-icons";
-import React, { useState } from "react";
-import { Image, Pressable, Text, View } from "react-native";
-import FollowButton from "../button/FollowButton";
 import { useArtist } from "@/src/providers/ArtistContext";
 import { userService } from "@/src/services/userService";
+import { FontAwesome } from "@expo/vector-icons";
+import React from "react";
+import { Image, Pressable, Text, View } from "react-native";
+import FollowButton from "../button/FollowButton";
 
 type AritstItemProps = {
   artist: Artist;

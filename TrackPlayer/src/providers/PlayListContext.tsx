@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useReducer, ReactNode } from "react";
 import { Playlist, Track } from "@/src/constants/types";
+import React, { createContext, ReactNode, useContext, useReducer } from "react";
 
 type State = {
   playlists: Playlist[];
@@ -11,7 +11,8 @@ type Action =
   | { type: "DELETE_PLAYLIST"; payload: string }
   | { type: "RENAME_PLAYLIST"; payload: { id: string; name: string } }
   | { type: "ADD_TRACK"; payload: { playlistId: string; track: Track } }
-  | { type: "REMOVE_TRACK"; payload: { playlistId: string; trackId: string } };
+  | { type: "REMOVE_TRACK"; payload: { playlistId: string; trackId: string } }
+  | { type: "UPDATE_PLAYLIST"; payload: Playlist };
 
 const PlaylistContext = createContext<{
   state: State;
@@ -25,49 +26,18 @@ function reducer(state: State, action: Action): State {
   switch (action.type) {
     case "SET_PLAYLISTS":
       return { ...state, playlists: action.payload };
-
     case "ADD_PLAYLIST":
-      return { ...state, playlists: [action.payload, ...state.playlists] };
-
-    case "DELETE_PLAYLIST":
       return {
         ...state,
-        playlists: state.playlists.filter((p) => p._id !== action.payload),
+        playlists: [...state.playlists, action.payload], 
       };
-
-    case "RENAME_PLAYLIST":
+    case "UPDATE_PLAYLIST":
       return {
         ...state,
         playlists: state.playlists.map((p) =>
-          p._id === action.payload.id ? { ...p, name: action.payload.name } : p
+          p._id === action.payload._id ? action.payload : p
         ),
       };
-
-    case "ADD_TRACK":
-      return {
-        ...state,
-        playlists: state.playlists.map((p) =>
-          p._id === action.payload.playlistId
-            ? { ...p, tracks: [...p.tracks, action.payload.track] }
-            : p
-        ),
-      };
-
-    case "REMOVE_TRACK":
-      return {
-        ...state,
-        playlists: state.playlists.map((p) =>
-          p._id === action.payload.playlistId
-            ? {
-                ...p,
-                tracks: p.tracks.filter(
-                  (t) => t._id !== action.payload.trackId
-                ),
-              }
-            : p
-        ),
-      };
-
     default:
       return state;
   }

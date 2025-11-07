@@ -1,7 +1,7 @@
 import { colors, fontSize } from "@/src/constants/tokens";
 import { moderateScale, scale, verticalScale } from "@/src/helpers/scales";
 import React from "react";
-import { Pressable, Text, ViewStyle } from "react-native";
+import { Text, TouchableOpacity, ViewStyle } from "react-native";
 
 type FollowButtonProps = {
   style?: ViewStyle;
@@ -11,7 +11,7 @@ type FollowButtonProps = {
 
 export default function FollowButton({ style, followed, onPress }: FollowButtonProps) {
   return (
-    <Pressable
+    <TouchableOpacity
     onPress={onPress}
       style={[
         style,
@@ -32,8 +32,8 @@ export default function FollowButton({ style, followed, onPress }: FollowButtonP
           color: followed ? colors.smallText : "white",
         }}
       >
-        Follow
+        {followed ? "Followed" : "Follow"}
       </Text>
-    </Pressable>
+    </TouchableOpacity>
   );
 }

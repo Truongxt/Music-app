@@ -27,10 +27,10 @@ import {
 } from "../helpers/formatters";
 import { useCommentSheet } from "../providers/CommentBottomSheetContext";
 import { useAudioPlayerGlobal } from "../providers/PlayerContext";
-import { commentService } from "../services/commentService";
-import { userService } from "../services/userService";
 import { useTrack } from "../providers/TrackContext";
+import { commentService } from "../services/commentService";
 import { trackService } from "../services/trackService";
+import { userService } from "../services/userService";
 
 export default function Player() {
   const [likedTrack, setLikedTrack] = useState<boolean>(false);

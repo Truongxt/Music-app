@@ -56,7 +56,6 @@ const TabsNavigation = () => {
         />
       </Tabs>
       <FloatingPlayer style={{position: "absolute", bottom: 60}}/>
-      {/* <CommentBottomSheet /> */}
     </>
   );
 };

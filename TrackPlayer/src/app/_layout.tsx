@@ -3,11 +3,13 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { ArtistProvider } from "../providers/ArtistContext";
 import { AuthProvider, useAuth } from "../providers/AuthContext";
 import { CommentSheetProvider } from "../providers/CommentBottomSheetContext";
 import { AudioPlayerProvider } from "../providers/PlayerContext";
 import { PlaylistProvider } from "../providers/PlayListContext";
-import { ArtistProvider } from "../providers/ArtistContext";
+import { PlaylistPickerProvider } from "../providers/PlaylistPickerSheetContext";
+import { TrackActionSheetProvider } from "../providers/TrackActionBottomSheetContext";
 import { TrackProvider } from "../providers/TrackContext";
 
 SplashScreen.preventAutoHideAsync();
@@ -21,10 +23,14 @@ export default function App() {
             <PlaylistProvider>
               <TrackProvider>
                 <CommentSheetProvider>
-                  <AudioPlayerProvider>
-                    <RootNavigation />
-                    <StatusBar style="auto"/>
-                  </AudioPlayerProvider>
+                  <PlaylistPickerProvider>
+                    <TrackActionSheetProvider>
+                      <AudioPlayerProvider>
+                        <RootNavigation />
+                        <StatusBar style="auto" />
+                      </AudioPlayerProvider>
+                    </TrackActionSheetProvider>
+                  </PlaylistPickerProvider>
                 </CommentSheetProvider>
               </TrackProvider>
             </PlaylistProvider>

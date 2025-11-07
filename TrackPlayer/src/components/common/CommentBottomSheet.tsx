@@ -37,7 +37,7 @@ export default function CommentBottomSheet({
   // mount once
   useEffect(() => {
     onMount({ open, close });
-  }, [onMount]);
+  }, []);
 
   const handleOnPostCmt = async () => {
     if (!target || !inputComment) return;

@@ -8,7 +8,7 @@ import { useEffect } from "react";
 
 export default function DrawerLayout() {
   const { dispatch: dispatchArtist } = useArtist();
-  const { dispatch: dispatchPlaylist } = usePlaylist();
+  const { dispatch: dispatchPlaylist, state } = usePlaylist();
   const { dispatch: dispatchTrack } = useTrack();
 
   useEffect(() => {

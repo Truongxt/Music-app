@@ -1,11 +1,11 @@
+import { useRouter } from "expo-router";
 import React from "react";
 import { FlatList } from "react-native-gesture-handler";
-import ArtistItem from "./artist/ArtistItem";
-import TrackItem from "./tracks/TrackItem";
-import { useAudioPlayerGlobal } from "../providers/PlayerContext";
-import { useRouter } from "expo-router";
 import { Track } from "../constants/types";
+import { useAudioPlayerGlobal } from "../providers/PlayerContext";
+import ArtistItem from "./artist/ArtistItem";
 import PlayListItem from "./playlist/PlayListItem";
+import TrackItem from "./tracks/TrackItem";
 
 type LibraryListProps = {
   library: any[];
@@ -24,7 +24,9 @@ export default function LibraryList({ library }: LibraryListProps) {
     router.push({ pathname: "/library/artist/[id]", params: { id } });
   };
 
-  const handleClickOnPlaylist = () => {};
+  const handleClickOnPlaylist = (id: string) => {
+    router.push(`/(drawer)/(tabs)/library/playlist/${id}`)
+  };
 
   return (
     <FlatList

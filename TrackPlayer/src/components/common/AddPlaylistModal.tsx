@@ -1,7 +1,5 @@
 import { colors, fontSize } from "@/src/constants/tokens";
 import { moderateScale, scale, verticalScale } from "@/src/helpers/scales";
-import { usePlaylist } from "@/src/providers/PlayListContext";
-import { playlistService } from "@/src/services/playlistService";
 import React, { useState } from "react";
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
@@ -9,26 +7,16 @@ import { TextInput } from "react-native-gesture-handler";
 type AddPlaylistModalProps = {
   visible: boolean;
   onClose: () => void;
+  onSave: (name: string)=> void;
 };
 
 export default function AddPlaylistModal({
   visible,
   onClose,
+  onSave
 }: AddPlaylistModalProps) {
     const [inputName, setInputName] = useState<string>("");
-    const { state, dispatch } = usePlaylist();
-  const onSave = async () => {
-    try{
-        if(inputName?.trim() === ""){
-            return;
-        }
-        const data = await playlistService.add(inputName);
-        dispatch({type:'ADD_PLAYLIST', payload: data});
-        console.log(state.playlists);
-    }catch(err){
-        console.log(err);
-    }
-  };
+  
   return (
     <Modal
       visible={visible}
@@ -72,7 +60,7 @@ export default function AddPlaylistModal({
               <Text style={styles.normalText}>Cancle</Text>
             </TouchableOpacity>
             <TouchableOpacity
-            onPress={onSave}
+            onPress={()=>onSave(inputName)}
               style={[styles.button, { backgroundColor: colors.primary }]}
             >
               <Text style={styles.normalText}>Save</Text>

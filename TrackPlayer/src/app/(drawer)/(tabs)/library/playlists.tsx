@@ -4,6 +4,7 @@ import PlayListItem from "@/src/components/playlist/PlayListItem";
 import { colors, fontSize } from "@/src/constants/tokens";
 import { moderateScale, scale, verticalScale } from "@/src/helpers/scales";
 import { usePlaylist } from "@/src/providers/PlayListContext";
+import { playlistService } from "@/src/services/playlistService";
 import { defaultStyles } from "@/src/styles";
 import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -12,7 +13,7 @@ import { FlatList, Text, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Playlists() {
-  const { state } = usePlaylist();
+  const { state, dispatch } = usePlaylist();
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const router = useRouter();
 
@@ -22,6 +23,19 @@ export default function Playlists() {
 
   const handleOnPlaylistClick = (playlistId: string) => {
     router.push(`/(drawer)/(tabs)/library/playlist/${playlistId}`);
+  };
+
+  const onSave = async (name: string) => {
+    try {
+      if (name?.trim() === "") {
+        return;
+      }
+      const data = await playlistService.add(name);
+      dispatch({ type: "ADD_PLAYLIST", payload: data });
+      setModalVisible(false);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -48,7 +62,9 @@ export default function Playlists() {
       </Text>
       <FlatList
         data={state.playlists}
-        renderItem={({ item }) => <PlayListItem onPress={handleOnPlaylistClick} playlist={item} />}
+        renderItem={({ item }) => (
+          <PlayListItem onPress={handleOnPlaylistClick} playlist={item} />
+        )}
       />
       <TouchableOpacity
         onPress={() => setModalVisible(true)}
@@ -67,7 +83,7 @@ export default function Playlists() {
         <AntDesign name="plus" size={24} color="white" />
       </TouchableOpacity>
       {modalVisible && (
-        <AddPlaylistModal visible={modalVisible} onClose={handleOnCloseModal} />
+        <AddPlaylistModal onSave={onSave} visible={modalVisible} onClose={handleOnCloseModal} />
       )}
     </SafeAreaView>
   );

@@ -1,7 +1,7 @@
 import { SearchBar } from "@/src/components/common/SearchBar";
 import { SearchList } from "@/src/components/SearchList";
 import { colors, fontSize } from "@/src/constants/tokens";
-import { verticalScale } from "@/src/helpers/scales";
+import { scale, verticalScale } from "@/src/helpers/scales";
 import { searchService } from "@/src/services/searchService";
 import { defaultStyles } from "@/src/styles";
 import React, { useMemo, useState } from "react";
@@ -85,7 +85,17 @@ export default function Search() {
         ))}
       </View>
 
-      <SearchList searchData={filteredResults} />
+      {filteredResults.length === 0 && (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <Text style={{ fontSize: scale(fontSize.sm) }}>No result</Text>
+        </View>
+      )}
+
+      {filteredResults.length > 0 && (
+        <SearchList searchData={filteredResults} />
+      )}
     </SafeAreaView>
   );
 }

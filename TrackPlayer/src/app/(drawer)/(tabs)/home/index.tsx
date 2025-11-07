@@ -68,6 +68,9 @@ export default function Home() {
     router.push(`/home/artist/${id}`);
   };
 
+  const handleOnSearch = () => {
+    router.push('/search');
+  }
   return (
     <SafeAreaView style={defaultStyles.container}>
       <Header
@@ -112,7 +115,7 @@ export default function Home() {
           >
             {user?.displayName}
           </Text>
-          <SearchBar style={{ marginVertical: verticalScale(15) }} />
+          <SearchBar isStatic onPress={handleOnSearch} style={{ marginVertical: verticalScale(15) }} />
 
           {/* Suggest for you */}
           <View style={styles.sections}>

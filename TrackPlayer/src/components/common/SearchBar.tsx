@@ -1,16 +1,53 @@
 import { colors } from "@/src/constants/tokens";
 import { moderateScale, scale } from "@/src/helpers/scales";
 import { Ionicons } from "@expo/vector-icons";
-import { StyleProp, StyleSheet, TextInput, TouchableOpacity, View, ViewStyle } from "react-native";
+import {
+  StyleProp,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from "react-native";
 type SearchBarType = {
   value?: string;
   onChange?: (text: string) => void;
   onClear?: () => void;
   style?: StyleProp<ViewStyle>;
   onSubmit?: () => void;
+  isStatic?: boolean;
+  onPress?: () => void;
 };
 
-export const SearchBar = ({ value, onChange, onClear, style, onSubmit }: SearchBarType) => {
+export const SearchBar = ({
+  value,
+  onChange,
+  onClear,
+  style,
+  onSubmit,
+  isStatic,
+  onPress,
+}: SearchBarType) => {
+  if (isStatic) {
+    return (
+      <TouchableOpacity
+        style={[styles.container, style]}
+        activeOpacity={0.7}
+        onPress={onPress}
+      >
+        <Ionicons
+          name="search"
+          size={moderateScale(23)}
+          color={colors.textMuted}
+        />
+        <TextInput
+          editable={false}
+          style={styles.inputText}
+          placeholder="What do you want to listen?"
+        />
+      </TouchableOpacity>
+    );
+  }
   return (
     <View style={[styles.container, style]}>
       <View>
@@ -39,7 +76,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.borderColor,
     borderRadius: scale(50),
-    paddingHorizontal:  scale(10),
+    paddingHorizontal: scale(10),
   },
   inputText: {
     width: "80%",

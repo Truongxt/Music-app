@@ -1,7 +1,7 @@
 export type Track = {
   _id: string;
   title: string;
-  artist: [{ id: string; name: string }];
+  artist: [{ _id: string; name: string }];
   img: string;
   file: string;
   likes: number;

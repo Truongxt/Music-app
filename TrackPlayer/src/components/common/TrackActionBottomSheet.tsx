@@ -7,14 +7,15 @@ import { useTrack } from "@/src/providers/TrackContext";
 import { trackService } from "@/src/services/trackService";
 import { userService } from "@/src/services/userService";
 import {
-    FontAwesome,
-    Ionicons,
-    MaterialCommunityIcons,
+  FontAwesome,
+  Ionicons,
+  MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import BottomSheet, {
-    BottomSheetBackdrop,
-    BottomSheetView,
+  BottomSheetBackdrop,
+  BottomSheetView,
 } from "@gorhom/bottom-sheet";
+import { useRouter } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -24,10 +25,11 @@ type Props = {
 
 export default function TrackActionBottomSheet({ onMount }: Props) {
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const { selectedTrack } = useTrackActionSheet();
+  const { selectedTrack, closeActionSheet } = useTrackActionSheet();
   const { tracks, dispatch } = useTrack();
   const [likedTrack, setLikedTrack] = useState<boolean>(false);
   const { openPlaylistPicker } = usePlaylistPicker();
+  const router = useRouter();
 
   useEffect(() => {
     setLikedTrack(tracks.some((t) => t._id === selectedTrack?._id));
@@ -63,9 +65,16 @@ export default function TrackActionBottomSheet({ onMount }: Props) {
   };
 
   const onAddToPlaylist = () => {
-    if(!selectedTrack) return;
+    if (!selectedTrack) return;
     openPlaylistPicker(selectedTrack);
-  } 
+  };
+
+  const onMoveToAritst = () => {
+    router.push(
+      `/(drawer)/(tabs)/library/artist/${selectedTrack?.artist[0]._id}`
+    );
+    closeActionSheet();
+  };
 
   return (
     <BottomSheet
@@ -133,10 +142,7 @@ export default function TrackActionBottomSheet({ onMount }: Props) {
                 : "Add to favorite list"}
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.item}
-            onPress={onAddToPlaylist}
-          >
+          <TouchableOpacity style={styles.item} onPress={onAddToPlaylist}>
             <Ionicons
               name="add-circle-outline"
               size={moderateScale(24)}
@@ -144,9 +150,9 @@ export default function TrackActionBottomSheet({ onMount }: Props) {
             />
             <Text style={styles.itemTitle}>Add to playlist</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.item}>
+          <TouchableOpacity style={styles.item} onPress={onMoveToAritst}>
             <FontAwesome name="user-o" size={moderateScale(22)} color="black" />
-            <Text style={styles.itemTitle}>Add to Favorite List</Text>
+            <Text style={styles.itemTitle}>Move to artist</Text>
           </TouchableOpacity>
         </View>
       </BottomSheetView>

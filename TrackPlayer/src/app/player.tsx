@@ -37,15 +37,35 @@ export default function Player() {
   const router = useRouter();
   const { openCommentSheet } = useCommentSheet();
   const { tracks, dispatch } = useTrack();
-  const { currentTrack, status, pause, resume, seek } = useAudioPlayerGlobal();
+  const {
+    currentTrack,
+    status,
+    pause,
+    resume,
+    seek,
+    currentIndex,
+    queue,
+    playPrev,
+    playNext,
+  } = useAudioPlayerGlobal();
   const [isSliding, setIsSliding] = useState(false);
   const [sliderValue, setSliderValue] = useState(0);
+
+  const canGoBack = currentIndex > 0;
+  const canGoNext = queue && currentIndex < queue.length - 1;
 
   useEffect(() => {
     const isLiked = tracks.some((item) => item._id === currentTrack?._id);
     setLikedTrack(isLiked);
   }, [tracks, currentTrack]);
 
+  const handleSkipBack = () => {
+    if (canGoBack) playPrev();
+  };
+
+  const handleSkipNext = () => {
+    if (canGoNext) playNext();
+  };
   const handleOnOpenCommentSheet = async () => {
     if (!currentTrack?._id) return;
     try {
@@ -152,7 +172,11 @@ export default function Player() {
               size={scale(22)}
               color="white"
             />
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleSkipBack}
+              disabled={!canGoBack}
+              style={{ opacity: canGoBack ? 1 : 0.3 }}
+            >
               <Feather name="skip-back" size={scale(26)} color="white" />
             </TouchableOpacity>
             <TouchableOpacity
@@ -165,7 +189,11 @@ export default function Player() {
                 size={scale(28)}
               />
             </TouchableOpacity>
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleSkipNext}
+              disabled={!canGoNext}
+              style={{ opacity: canGoNext ? 1 : 0.3 }}
+            >
               <Feather name="skip-forward" size={scale(26)} color="white" />
             </TouchableOpacity>
             <TouchableOpacity>

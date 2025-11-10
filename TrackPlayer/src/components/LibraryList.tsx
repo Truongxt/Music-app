@@ -25,7 +25,7 @@ export default function LibraryList({ library }: LibraryListProps) {
   };
 
   const handleClickOnPlaylist = (id: string) => {
-    router.push(`/(drawer)/(tabs)/library/playlist/${id}`)
+    router.push(`/(drawer)/(tabs)/library/playlist/${id}`);
   };
 
   return (
@@ -44,6 +44,7 @@ export default function LibraryList({ library }: LibraryListProps) {
           case "track":
             return (
               <TrackItem
+                library={true}
                 onTrackSelect={() => handleTrackSelected(item, index)}
                 track={item}
               />

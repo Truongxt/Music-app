@@ -36,7 +36,6 @@ export default function Login() {
   }
 
   const handleOnChangePassword = (text: string)=>{
-    console.log(text)
     setPassword(text);
   }
 

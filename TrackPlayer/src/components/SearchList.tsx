@@ -27,12 +27,15 @@ export const SearchList = ({ searchData }: TrackListProps) => {
 
   return (
     <FlatList
+      showsVerticalScrollIndicator={false}
       data={searchData}
       keyExtractor={(item) => `${item.type}-${item._id}`}
       renderItem={({ item, index }) => {
         switch (item.type) {
           case "artist":
-            return <ArtistItem handleOnSelect={handleClickOnAritst} artist={item} />;
+            return (
+              <ArtistItem handleOnSelect={handleClickOnAritst} artist={item} />
+            );
           case "album":
             return <AlbumItem album={item} />;
           case "track":

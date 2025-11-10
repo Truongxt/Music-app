@@ -14,9 +14,10 @@ import { trackService } from "@/src/services/trackService";
 import { userService } from "@/src/services/userService";
 import { defaultStyles } from "@/src/styles";
 import { Entypo, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Image,
   Pressable,
   ScrollView,
@@ -28,7 +29,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ArtistProfileScreen() {
   const { id } = useLocalSearchParams();
-  const router = useRouter();
   const { playTrack } = useAudioPlayerGlobal();
   const [artist, setArtist] = useState<any>();
   const [tracks, setTracks] = useState<Track[]>();
@@ -88,10 +88,23 @@ export default function ArtistProfileScreen() {
     playTrack(track);
   };
 
+  if (!artist || !tracks || !albums) {
+    return (
+      <SafeAreaView
+        style={[
+          defaultStyles.container,
+        ]}
+      >
+        <Header backIcon />
+        <ActivityIndicator color={colors.primary} />
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={defaultStyles.container}>
       <Header backIcon />
-      <ScrollView>
+      <ScrollView showsVerticalScrollIndicator={false}>
         {/* Thông tin artist */}
         <View style={{ alignItems: "center", gap: verticalScale(10) }}>
           <Image

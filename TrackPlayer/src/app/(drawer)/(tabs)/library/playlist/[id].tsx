@@ -51,7 +51,6 @@ export default function PlaylistDetail() {
       <SafeAreaView
         style={[
           defaultStyles.container,
-          { justifyContent: "center", alignItems: "center" },
         ]}
       >
         <Header backIcon />
